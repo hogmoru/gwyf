@@ -22,12 +22,12 @@ const (
 
 var (
 	delegateUrlTemplate = template.Must(template.New("schedUrl").Parse(wapUrl))
-	schedResultRegexp = regexp.MustCompile(schedResultPattern)
+	schedResultRegexp   = regexp.MustCompile(schedResultPattern)
 )
 
 type jsonResult struct {
-	DelegateDuration  float64 `json:"duration_s"`
-	IncomingTrains []train `json:"incoming_trains"`
+	DelegateDuration float64 `json:"duration_s"`
+	IncomingTrains   []train `json:"incoming_trains"`
 }
 
 type train struct {
@@ -41,14 +41,14 @@ func init() {
 }
 
 func errorHandler(f func(http.ResponseWriter, appengine.Context, *http.Request) error) http.HandlerFunc {
-    return func(writer http.ResponseWriter, request *http.Request) {
-    	context := appengine.NewContext(request)
-        err := f(writer, context, request)
-        if err != nil {
-            http.Error(writer, err.Error(), http.StatusInternalServerError)
-            context.Errorf(err.Error())
-        }
-    }
+	return func(writer http.ResponseWriter, request *http.Request) {
+		context := appengine.NewContext(request)
+		err := f(writer, context, request)
+		if err != nil {
+			http.Error(writer, err.Error(), http.StatusInternalServerError)
+			context.Errorf(err.Error())
+		}
+	}
 }
 
 func worker(writer http.ResponseWriter, context appengine.Context, request *http.Request) error {
@@ -112,9 +112,9 @@ func parseDelegateResult(schedResult string) ([]train, error) {
 	return trains, nil
 }
 
-func mkMarshalFunc(pretty bool) func(interface {}) ([]byte, error) {
-	if (pretty) {
-		return func(input interface {}) ([]byte, error) {
+func mkMarshalFunc(pretty bool) func(interface{}) ([]byte, error) {
+	if pretty {
+		return func(input interface{}) ([]byte, error) {
 			return json.MarshalIndent(input, "", "  ")
 		}
 	} else {
@@ -125,14 +125,13 @@ func mkMarshalFunc(pretty bool) func(interface {}) ([]byte, error) {
 func buildSchedQuery(q map[string][]string) (schedQuery, error) {
 	mandatoryParameters := [...]string{"line", "direction", "station"}
 	for _, p := range mandatoryParameters {
-        if q[p] == nil {
-            return schedQuery{}, errors.New("Missing mandatory parameter '"+p+"'")
-        }
-    }
+		if q[p] == nil {
+			return schedQuery{}, errors.New("Missing mandatory parameter '" + p + "'")
+		}
+	}
 	return schedQuery{Mode: "rer", Line: q["line"][0], Direction: q["direction"][0], Station: q["station"][0]}, nil
 }
 
 type schedQuery struct {
 	Mode, Line, Direction, Station string
 }
-
