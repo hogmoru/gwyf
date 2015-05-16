@@ -72,6 +72,7 @@ func worker(writer http.ResponseWriter, context appengine.Context, request *http
 		return fmt.Errorf("Failed to encode result to JSON: %v", err)
 	}
 	writer.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
 	fmt.Fprint(writer, string(jsonTrains))
 	return nil
 }
